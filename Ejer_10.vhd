@@ -1,99 +1,45 @@
---------------------------------------------------------------------------------
--- Company: 
--- Engineer:
---
--- Create Date:   19:48:07 07/12/2022
--- Design Name:   
--- Module Name:   C:/Xilinx/Ejercicios02/Ejer_10.vhd
--- Project Name:  Ejercicios02
--- Target Device:  
--- Tool versions:  
--- Description:   
--- 
--- VHDL Test Bench Created by ISE for module: Ejer_10
--- 
--- Dependencies:
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
---
--- Notes: 
--- This testbench has been automatically generated using types std_logic and
--- std_logic_vector for the ports of the unit under test.  Xilinx recommends
--- that these types always be used for the top-level I/O of a design in order
--- to guarantee that the testbench will bind correctly to the post-implementation 
--- simulation model.
---------------------------------------------------------------------------------
-LIBRARY ieee;
-USE ieee.std_logic_1164.ALL;
- 
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---USE ieee.numeric_std.ALL;
- 
-ENTITY Ejer_10 IS
-END Ejer_10;
- 
-ARCHITECTURE behavior OF Ejer_10 IS 
- 
-    -- Component Declaration for the Unit Under Test (UUT)
- 
-    COMPONENT Ejer_10
-    PORT(
-         clk : IN  std_logic;
-         C : IN  std_logic;
-         SAL1 : INOUT  std_logic;
-         SAL2 : INOUT  std_logic;
-         Q : OUT  std_logic_vector(3 downto 0)
-        );
-    END COMPONENT;
-    
+-- Bryan Angamarca
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
-   --Inputs
-   signal clk : std_logic := '0';
-   signal C : std_logic := '0';
+entity Ejer_10 is
+    Port ( clk, C : in  STD_LOGIC;
+           SAL1, SAL2 : inout  STD_LOGIC;
+           Q : out  STD_LOGIC_VECTOR (3 downto 0));
+end Ejer_10;
 
-	--BiDirs
-   signal SAL1 : std_logic;
-   signal SAL2 : std_logic;
+architecture Behavioral of Ejer_10 is
+signal Qaux : STD_LOGIC_VECTOR (3 downto 0) := "0000";
+begin
+	Q <= Qaux;
+	process(clk, C)
+	begin
+		if (clk'event and clk = '1') then
+			if (C = '0') then
+				if(Qaux = "1001") then
+					Qaux <= "0000";
+				else
+					Qaux <= Qaux+1;
+				end if;
+			else
+				if(Qaux = "0000") then
+					Qaux <= "1001";
+				else
+					Qaux <= Qaux-1;
+				end if;
+			end if;
+			if (C = '0' and Qaux(0) = '1') then
+				SAL1 <= '1';
+				SAL2 <= '0';
+			elsif(C = '1' and Qaux(0) = '0') then
+				SAL1 <= '0';
+				SAL2 <= '1';
+			else
+				SAL1 <= '0';
+				SAL2 <= '0';
+			end if;
+		end if;
+	end process;
+end Behavioral;
 
- 	--Outputs
-   signal Q : std_logic_vector(3 downto 0);
-
-   -- Clock period definitions
-   constant clk_period : time := 10 ns;
- 
-BEGIN
- 
-	-- Instantiate the Unit Under Test (UUT)
-   uut: Ejer_10 PORT MAP (
-          clk => clk,
-          C => C,
-          SAL1 => SAL1,
-          SAL2 => SAL2,
-          Q => Q
-        );
-
-   -- Clock process definitions
-   clk_process :process
-   begin
-		clk <= '0';
-		wait for clk_period/2;
-		clk <= '1';
-		wait for clk_period/2;
-   end process;
- 
-
-   -- Stimulus process
-   stim_proc: process
-   begin		
-      -- hold reset state for 100 ns.
-      	wait for clk_period*20;
-		C <= '0';
-      wait for clk_period*20;
-		C <= '1';
-      wait;
-   end process;
-
-END;
